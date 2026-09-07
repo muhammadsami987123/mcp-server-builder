@@ -1,4 +1,5 @@
 """Safe URL fetching with SSRF protection."""
+import ipaddress
 import re
 import socket
 from typing import Optional, Tuple
@@ -23,11 +24,28 @@ class URLFetcher:
 
     @staticmethod
     def _is_blocked_ip(ip: str) -> bool:
-        """Check if IP is in blocked ranges."""
-        for pattern in BLOCKED_IP_PATTERNS:
-            if ip.startswith(pattern):
+        """Check if IP is in blocked ranges using ipaddress module."""
+        try:
+            ip_obj = ipaddress.ip_address(ip)
+
+            # Check reserved/private ranges using ipaddress module
+            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or \
+               ip_obj.is_reserved or ip_obj.is_multicast:
                 return True
-        return False
+
+            # Additional check for AWS metadata endpoint (169.254.169.254)
+            if ip == "169.254.169.254":
+                return True
+
+            # Legacy pattern matching as fallback
+            for pattern in BLOCKED_IP_PATTERNS:
+                if ip.startswith(pattern):
+                    return True
+
+            return False
+        except ValueError:
+            # Invalid IP format - block it to be safe
+            return True
 
     @staticmethod
     def _validate_url(url: str) -> Tuple[bool, Optional[str]]:
@@ -56,18 +74,27 @@ class URLFetcher:
     @staticmethod
     def _resolve_and_check_ip(hostname: str) -> Tuple[bool, Optional[str]]:
         """
-        Resolve hostname and check if IP is blocked.
+        Resolve hostname to ALL addresses and validate each.
+        Prevents DNS rebinding attacks by checking all resolved IPs.
         Returns (is_allowed, error_message)
         """
         try:
-            # Resolve hostname to IP
-            ip = socket.gethostbyname(hostname)
+            # Get ALL resolved addresses (not just first one)
+            addr_infos = socket.getaddrinfo(hostname, None)
 
-            # Check for blocked IPs
-            if URLFetcher._is_blocked_ip(ip):
-                return False, f"Access to {ip} is blocked (private/reserved network)"
+            if not addr_infos:
+                return False, f"Cannot resolve hostname: {hostname}"
+
+            # Extract unique IP addresses
+            resolved_ips = {addr[4][0] for addr in addr_infos}
+
+            # Validate each resolved IP
+            for ip in resolved_ips:
+                if URLFetcher._is_blocked_ip(ip):
+                    return False, f"Access to {ip} resolved from {hostname} is blocked (private/reserved network)"
 
             return True, None
+
         except socket.gaierror:
             return False, f"Cannot resolve hostname: {hostname}"
         except socket.error as e:
@@ -84,6 +111,7 @@ class URLFetcher:
     ) -> str:
         """
         Safely fetch URL content with SSRF protection.
+        Manually handles redirects with re-validation of each hop.
 
         Args:
             url: URL to fetch
@@ -98,22 +126,6 @@ class URLFetcher:
             SSRFException: If SSRF protection blocks the request
             httpx.RequestError: If request fails
         """
-        # Validate URL format
-        is_valid, error = URLFetcher._validate_url(url)
-        if not is_valid:
-            raise SSRFException(error)
-
-        parsed = urlparse(url)
-        hostname = parsed.hostname
-
-        if not hostname:
-            raise SSRFException("Cannot extract hostname from URL")
-
-        # Resolve and check IP
-        is_allowed, error = URLFetcher._resolve_and_check_ip(hostname)
-        if not is_allowed:
-            raise SSRFException(error)
-
         # Prepare headers
         if headers is None:
             headers = {}
@@ -122,45 +134,83 @@ class URLFetcher:
         if "User-Agent" not in headers:
             headers["User-Agent"] = "MCP-Server-Builder/1.0"
 
+        # Manual redirect handling to validate each hop
+        current_url = url
+        redirect_count = 0
+
         try:
             async with httpx.AsyncClient(
-                follow_redirects=True,
+                follow_redirects=False,  # Manually handle redirects
                 limits=httpx.Limits(
                     max_redirects=MAX_REDIRECTS,
                     max_connections=10,
                 ),
             ) as client:
-                response = await client.request(
-                    method,
-                    url,
-                    headers=headers,
-                    timeout=timeout,
-                )
+                while redirect_count <= MAX_REDIRECTS:
+                    # Validate URL format for this hop
+                    is_valid, error = URLFetcher._validate_url(current_url)
+                    if not is_valid:
+                        raise SSRFException(f"Invalid redirect URL: {error}")
 
-                # Check response size
-                content_length = response.headers.get("content-length")
-                if content_length:
-                    try:
-                        if int(content_length) > MAX_RESPONSE_SIZE:
+                    parsed = urlparse(current_url)
+                    hostname = parsed.hostname
+
+                    if not hostname:
+                        raise SSRFException("Cannot extract hostname from URL")
+
+                    # Re-validate IP for this hop (prevents DNS rebinding)
+                    is_allowed, error = URLFetcher._resolve_and_check_ip(hostname)
+                    if not is_allowed:
+                        raise SSRFException(f"Redirect to blocked destination: {error}")
+
+                    # Make request without auto-following
+                    response = await client.request(
+                        method,
+                        current_url,
+                        headers=headers,
+                        timeout=timeout,
+                    )
+
+                    # Check response size
+                    content_length = response.headers.get("content-length")
+                    if content_length:
+                        try:
+                            if int(content_length) > MAX_RESPONSE_SIZE:
+                                raise httpx.RequestError(
+                                    f"Response too large: {content_length} > {MAX_RESPONSE_SIZE}"
+                                )
+                        except ValueError:
+                            pass
+
+                    # Handle redirects manually
+                    if response.is_redirect:
+                        redirect_count += 1
+                        redirect_location = response.headers.get("location")
+
+                        if not redirect_location:
+                            raise SSRFException("Redirect without Location header")
+
+                        # Resolve relative URLs
+                        from urllib.parse import urljoin
+                        current_url = urljoin(current_url, redirect_location)
+                        continue
+
+                    # Not a redirect - process response
+                    response.raise_for_status()
+
+                    # Read content with size limit
+                    content = b""
+                    async for chunk in response.aiter_bytes(chunk_size=8192):
+                        content += chunk
+                        if len(content) > MAX_RESPONSE_SIZE:
                             raise httpx.RequestError(
-                                f"Response too large: {content_length} > {MAX_RESPONSE_SIZE}"
+                                f"Response too large: exceeded {MAX_RESPONSE_SIZE} bytes"
                             )
-                    except ValueError:
-                        pass
 
-                # Raise for status
-                response.raise_for_status()
+                    return content.decode("utf-8", errors="ignore")
 
-                # Read content with size limit
-                content = b""
-                async for chunk in response.aiter_bytes(chunk_size=8192):
-                    content += chunk
-                    if len(content) > MAX_RESPONSE_SIZE:
-                        raise httpx.RequestError(
-                            f"Response too large: exceeded {MAX_RESPONSE_SIZE} bytes"
-                        )
-
-                return content.decode("utf-8", errors="ignore")
+                # Too many redirects
+                raise SSRFException(f"Too many redirects (max {MAX_REDIRECTS})")
 
         except SSRFException:
             raise
