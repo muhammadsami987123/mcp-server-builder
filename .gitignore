@@ -1,0 +1,111 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.sublime-project
+.sublime-workspace
+*.code-workspace
+.project
+.pydevproject
+.settings/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+
+# Type Checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Documentation
+site/
+docs/_build/
+
+# Local Development
+.vscode-server/
+.devcontainer/
+
+# Generated Projects (optional – comment if you want to version control generated MCPs)
+app/data/
+generated-projects/
+
+# Temporary Files
+*.tmp
+*.temp
+*.log
+logs/
+
+# Node/npm (if frontend ever uses build tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# macOS
+.DS_Store
+._*
+
+# Windows
+*.lnk
+Thumbs.db
+$RECYCLE.BIN/
+
+# Code-specific
+.pre-commit-config.yaml
+.pre-commit-hooks.yaml
+
+# Misc
+.gitignore.swp

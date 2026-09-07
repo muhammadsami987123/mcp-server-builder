@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Turn any API into an MCP server. Paste a URL, our AI analyzes it and generates a complete, runnable MCP server.">
+    <meta name="og:title" content="MCP Server Builder - AI-Powered Server Generation">
+    <meta name="og:description" content="Turn any API into an MCP server in seconds.">
+    <meta name="og:type" content="website">
+    <title>MCP Server Builder - Turn APIs Into MCP Servers</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="/">
+                    <span class="brand-icon">⚙️</span>
+                    <span class="brand-text">MCP Builder</span>
+                </a>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="/" class="nav-link active">Home</a></li>
+                <li><a href="/builder" class="nav-link">Builder</a></li>
+                <li><a href="/history" class="nav-link">History</a></li>
+                <li><a href="https://docs.example.com" class="nav-link" target="_blank">Docs</a></li>
+            </ul>
+            <button class="navbar-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Turn Any API Into an MCP Server</h1>
+            <p class="hero-subtitle">Paste a URL. Our AI analyzes it and generates a complete, production-ready MCP server.</p>
+
+            <div class="hero-input-group">
+                <input
+                    type="url"
+                    id="heroUrlInput"
+                    class="hero-input"
+                    placeholder="https://api.example.com/docs"
+                    aria-label="API URL input"
+                >
+                <button class="btn btn-primary btn-lg" id="heroSubmitBtn" aria-label="Build MCP server">
+                    <span class="btn-text">Build MCP</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </div>
+            <p class="hero-hint">Support for OpenAPI, Swagger, REST docs, and API references</p>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">From API documentation to production MCP server in four steps</p>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Paste URL</h3>
+                    <p class="step-description">Provide a link to your API documentation or OpenAPI specification</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">AI Analysis</h3>
+                    <p class="step-description">Our system discovers endpoints, parameters, and authentication methods</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Tool Design</h3>
+                    <p class="step-description">AI designs optimal MCP tools for your API's capabilities</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Download</h3>
+                    <p class="step-description">Get a complete, tested, production-ready MCP server</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Formats -->
+    <section class="section supported-formats">
+        <div class="container">
+            <h2 class="section-title">Supported API Documentation</h2>
+            <p class="section-subtitle">We recognize and parse these formats automatically</p>
+
+            <div class="formats-grid">
+                <div class="format-item">
+                    <h4>OpenAPI 3.0+</h4>
+                    <p>JSON and YAML specifications</p>
+                </div>
+                <div class="format-item">
+                    <h4>Swagger 2.0</h4>
+                    <p>Traditional Swagger definitions</p>
+                </div>
+                <div class="format-item">
+                    <h4>REST Documentation</h4>
+                    <p>Markdown and HTML API docs</p>
+                </div>
+                <div class="format-item">
+                    <h4>API References</h4>
+                    <p>Developer portal documentation</p>
+                </div>
+                <div class="format-item">
+                    <h4>Machine-Readable Specs</h4>
+                    <p>RAML, GraphQL, and more</p>
+                </div>
+                <div class="format-item">
+                    <h4>Link Discovery</h4>
+                    <p>Follows documentation links automatically</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need for production MCP servers</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Discovery</h3>
+                    <p>Automatically finds OpenAPI specs, Swagger definitions, and documentation across your API</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Driven Design</h3>
+                    <p>GPT-4 intelligently designs optimal MCP tools for your API's unique capabilities</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3>Automatic Validation</h3>
+                    <p>Generated servers are validated for correctness and compatibility</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>Production Ready</h3>
+                    <p>Complete project with README, requirements, tests, and configuration</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Secure by Default</h3>
+                    <p>Authentication handled safely with environment variables, no credentials in code</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Tool Control</h3>
+                    <p>Review, customize, and select which tools to include in your server</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example -->
+    <section class="section example">
+        <div class="container">
+            <h2 class="section-title">See It In Action</h2>
+            <p class="section-subtitle">Example: Building an MCP server from a REST API</p>
+
+            <div class="example-content">
+                <div class="example-code">
+                    <div class="code-header">Input: API Documentation URL</div>
+                    <pre><code class="language-text">https://api.example.com/docs</code></pre>
+                </div>
+
+                <div class="example-arrow">→</div>
+
+                <div class="example-result">
+                    <div class="code-header">Output: MCP Server</div>
+                    <pre><code class="language-python">from mcp.server import Server
+from mcp.types import Tool
+
+server = Server("example-api-mcp")
+
+@server.tool()
+def list_users(limit: int = 10) -> str:
+    """List users from the Example API"""
+    response = api_client.get("/users", params={"limit": limit})
+    return json.dumps(response.json())
+
+@server.tool()
+def get_user(user_id: str) -> str:
+    """Get a specific user by ID"""
+    response = api_client.get(f"/users/{user_id}")
+    return json.dumps(response.json())</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security -->
+    <section class="section security">
+        <div class="container">
+            <h2 class="section-title">Security First</h2>
+            <p class="section-subtitle">Your data and APIs are protected at every step</p>
+
+            <div class="security-grid">
+                <div class="security-item">
+                    <h4>SSRF Protection</h4>
+                    <p>Blocks requests to localhost, private IPs, and internal networks</p>
+                </div>
+                <div class="security-item">
+                    <h4>Timeout Protection</h4>
+                    <p>Limits request time to prevent hanging connections</p>
+                </div>
+                <div class="security-item">
+                    <h4>Size Limits</h4>
+                    <p>Prevents memory exhaustion from oversized responses</p>
+                </div>
+                <div class="security-item">
+                    <h4>No Credential Leaks</h4>
+                    <p>API keys and tokens never stored in generated code</p>
+                </div>
+                <div class="security-item">
+                    <h4>Secure Defaults</h4>
+                    <p>HTTPS required, insecure connections rejected</p>
+                </div>
+                <div class="security-item">
+                    <h4>Audit Trail</h4>
+                    <p>All operations logged for transparency and debugging</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section faq">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h4 class="faq-question">What is MCP?</h4>
+                    <p class="faq-answer">Model Context Protocol is an open standard that allows AI models to interact with external tools and data sources through a standardized interface.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 class="faq-question">Do I need to upload files?</h4>
+                    <p class="faq-answer">No. Just paste a URL to your API documentation. We automatically discover and parse OpenAPI specs, Swagger definitions, and other documentation formats.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 class="faq-question">What if my API doesn't have OpenAPI?</h4>
+                    <p class="faq-answer">Our system can parse regular HTML/Markdown documentation and extract API information from it using AI analysis.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 class="faq-question">Can I customize the generated server?</h4>
+                    <p class="faq-answer">Absolutely. Review the generated tools, select which ones to include, customize naming, and regenerate as needed.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 class="faq-question">Is the generated code production-ready?</h4>
+                    <p class="faq-answer">Yes. Generated servers include error handling, proper async patterns, environment configuration, and are validated for correctness.</p>
+                </div>
+                <div class="faq-item">
+                    <h4 class="faq-question">How does authentication work?</h4>
+                    <p class="faq-answer">API authentication is configured via environment variables. Your generated server handles Bearer tokens, API keys, and other auth methods securely.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section cta-final">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to build your first MCP server?</h2>
+                <p>Get started in seconds. No installation required.</p>
+                <a href="/builder" class="btn btn-primary btn-lg">Launch Builder</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>MCP Server Builder</h4>
+                    <p>AI-powered MCP server generation from API documentation.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/builder">Builder</a></li>
+                        <li><a href="/history">History</a></li>
+                        <li><a href="https://docs.example.com" target="_blank">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="https://modelcontextprotocol.io" target="_blank">About MCP</a></li>
+                        <li><a href="https://openapis.org" target="_blank">About OpenAPI</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MCP Server Builder. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="alert"></div>
+
+    <script src="/static/app.js" defer></script>
+</body>
+</html>

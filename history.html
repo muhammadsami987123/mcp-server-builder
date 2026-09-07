@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="History - MCP Server Builder">
+    <title>History - MCP Server Builder</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="/">
+                    <span class="brand-icon">⚙️</span>
+                    <span class="brand-text">MCP Builder</span>
+                </a>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/builder" class="nav-link">Builder</a></li>
+                <li><a href="/history" class="nav-link active">History</a></li>
+                <li><a href="https://docs.example.com" class="nav-link" target="_blank">Docs</a></li>
+            </ul>
+            <button class="navbar-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container page-container">
+        <div class="page-header">
+            <h1>Recent MCP Servers</h1>
+            <p>View and manage your generated MCP servers</p>
+        </div>
+
+        <div class="history-controls">
+            <input
+                type="text"
+                id="historySearch"
+                class="input-field"
+                placeholder="Search projects..."
+                aria-label="Search projects"
+            >
+            <button class="btn btn-secondary" id="clearHistoryBtn">Clear History</button>
+        </div>
+
+        <div id="historyContent" class="history-list-container">
+            <div class="empty-state">
+                <div class="empty-icon">📜</div>
+                <h3>No Projects Yet</h3>
+                <p>Start by building your first MCP server</p>
+                <a href="/builder" class="btn btn-primary">Build Server</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="alert"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>MCP Server Builder</h4>
+                    <p>AI-powered MCP server generation from API documentation.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/builder">Builder</a></li>
+                        <li><a href="/history">History</a></li>
+                        <li><a href="https://docs.example.com" target="_blank">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="https://modelcontextprotocol.io" target="_blank">About MCP</a></li>
+                        <li><a href="https://openapis.org" target="_blank">About OpenAPI</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MCP Server Builder. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/history.js" defer></script>
+</body>
+</html>

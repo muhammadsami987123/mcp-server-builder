@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project - MCP Server Builder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .project-info {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .project-info h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-item {
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .info-item strong { display: block; color: #667eea; margin-bottom: 5px; }
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .tools-list {
+            list-style: none;
+        }
+        .tools-list li {
+            padding: 12px;
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #667eea;
+        }
+        .file-tree {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .button:hover { background: #5568d3; }
+        .button-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .button-secondary:hover { background: #f9f9f9; }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <a href="/history" style="text-decoration: none; color: #667eea;">← Back to History</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading project details...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="project-info">
+                <h1 id="project-name"></h1>
+                <p id="project-description"></p>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>API</strong>
+                        <span id="project-api"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Base URL</strong>
+                        <span id="project-url" style="font-family: monospace; font-size: 0.9rem;"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Tools</strong>
+                        <span id="project-tools">0</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Created</strong>
+                        <span id="project-date"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="#" class="button" id="download-btn" onclick="downloadProject(); return false;">
+                        Download ZIP
+                    </a>
+                    <a href="/builder" class="button button-secondary">Build Another</a>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>MCP Tools</h2>
+                <ul class="tools-list" id="tools-list">
+                    <li>No tools available</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Generated Files</h2>
+                <div class="file-tree" id="file-tree">
+                    Loading...
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Validation Report</h2>
+                <div id="validation-report">
+                    <p>No validation data available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projectId = new URLSearchParams(window.location.search).get('id') ||
+                          window.location.pathname.split('/').pop();
+
+        async function loadProject() {
+            try {
+                const response = await fetch(`/api/project/${projectId}`);
+                const project = await response.json();
+
+                if (!response.ok) {
+                    throw new Error('Project not found');
+                }
+
+                displayProject(project);
+                await loadTools();
+                await loadFiles();
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `
+                    <div style="color: red;">Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        function displayProject(project) {
+            document.getElementById('project-name').textContent = project.server_name || 'MCP Server';
+            document.getElementById('project-description').textContent = project.server_description || '';
+            document.getElementById('project-api').textContent = project.source_api_name || '';
+            document.getElementById('project-url').textContent = project.api_base_url || 'N/A';
+            document.getElementById('project-tools').textContent = project.tool_count || 0;
+            document.getElementById('project-date').textContent = new Date(project.created_at).toLocaleDateString();
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+
+        async function loadTools() {
+            try {
+                const response = await fetch(`/api/project/${projectId}/tools`);
+                const data = await response.json();
+
+                if (data.tools && data.tools.length > 0) {
+                    const html = data.tools.map(tool => `
+                        <li>
+                            <strong>${tool.name}</strong>
+                            <p>${tool.description}</p>
+                        </li>
+                    `).join('');
+                    document.getElementById('tools-list').innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading tools:', error);
+            }
+        }
+
+        async function loadFiles() {
+            try {
+                const response = await fetch(`/api/project/${projectId}/files`);
+                const data = await response.json();
+
+                if (data.files) {
+                    const html = Object.keys(data.files)
+                        .sort()
+                        .map(file => `<div>📄 ${file}</div>`)
+                        .join('');
+                    document.getElementById('file-tree').innerHTML = html || 'No files';
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+            }
+        }
+
+        function downloadProject() {
+            window.location.href = `/api/project/${projectId}/download`;
+        }
+
+        // Load on page load
+        window.addEventListener('load', loadProject);
+    </script>
+</body>
+</html>
