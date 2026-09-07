@@ -3,8 +3,10 @@ from pathlib import Path
 
 # Base configuration
 BASE_DIR = Path(__file__).parent
+ROOT_DIR = BASE_DIR.parent
 DATA_DIR = BASE_DIR / "data"
-TEMPLATES_DIR = BASE_DIR.parent / "templates"
+TEMPLATES_DIR = ROOT_DIR / "src" / "templates"
+STATIC_DIR = ROOT_DIR / "src" / "static"
 
 # Ensure directories exist
 DATA_DIR.mkdir(exist_ok=True)

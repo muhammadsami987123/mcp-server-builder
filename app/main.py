@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import TEMPLATES_DIR
+from app.config import TEMPLATES_DIR, STATIC_DIR
 from app.routes import pages, analysis, generation, projects, downloads
 
 # Configure logging
@@ -56,12 +56,8 @@ async def health_check():
     return {"status": "ok", "version": "0.1.0"}
 
 
-# Mount static files if they exist
-import os
-from pathlib import Path
-
-static_dir = Path(__file__).parent.parent / "static"
-if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+# Mount static files
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 logger.info("MCP Server Builder initialized")
