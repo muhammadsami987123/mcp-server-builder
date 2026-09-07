@@ -326,14 +326,19 @@ class APIResponse(BaseModel):
             "required": tool.input_schema.required
         }
 
+        # Escape quotes outside f-string to avoid backslash in expression
+        escaped_desc = tool.description.replace('"', r'\"')
+        schema_str = str(schema).replace("'", '"')
+
         code = f'''{self.indent * 2}{{
 {self.indent * 3}"name": "{tool.name}",
-{self.indent * 3}"description": "{tool.description.replace('"', '\\"')}",
-{self.indent * 3}"inputSchema": {str(schema).replace("'", '"')},
+{self.indent * 3}"description": "{escaped_desc}",
+{self.indent * 3}"inputSchema": {schema_str},
 {self.indent * 3}"method": "{tool.method}",
 {self.indent * 3}"path": "{tool.path}",
 {self.indent * 3}"category": "{tool.category}",
-{self.indent * 2}}},\n'''
+{self.indent * 2}}},
+'''
 
         return code
 
