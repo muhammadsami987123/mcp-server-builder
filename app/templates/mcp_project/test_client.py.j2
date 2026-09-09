@@ -1,0 +1,9 @@
+"""Smoke tests for the shared API client."""
+from __future__ import annotations
+
+from src.client import get_client
+
+
+def test_get_client_builds_async_client():
+    client = get_client()
+    assert client is not None

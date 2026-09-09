@@ -1,0 +1,8 @@
+"""Smoke tests verifying the MCP server exposes its tools."""
+from __future__ import annotations
+
+from src.server import mcp
+
+
+def test_mcp_server_instantiated():
+    assert mcp is not None

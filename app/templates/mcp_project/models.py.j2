@@ -1,0 +1,11 @@
+"""Pydantic models for MCP tool inputs."""
+from __future__ import annotations
+
+from typing import Any, Optional
+
+from pydantic import BaseModel
+
+{% for block in model_blocks %}
+
+{{ block }}
+{% endfor %}

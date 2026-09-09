@@ -1,0 +1,22 @@
+"""Generated MCP server: {{ server_name }}."""
+from __future__ import annotations
+
+from mcp.server.fastmcp import FastMCP
+
+{% if group_names %}
+from src.tools import {{ group_names | join(", ") }}
+{% endif %}
+
+mcp = FastMCP("{{ server_name }}")
+
+{% for group in group_names %}
+{{ group }}.register(mcp)
+{% endfor %}
+
+
+def main() -> None:
+    mcp.run()
+
+
+if __name__ == "__main__":
+    main()

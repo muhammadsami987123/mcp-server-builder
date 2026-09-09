@@ -1,0 +1,24 @@
+[project]
+name = "mcp-server-builder"
+version = "0.1.0"
+description = "AI-powered platform that turns an API/documentation URL into a production-ready MCP server."
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+
+[tool.setuptools]
+packages = ["app"]

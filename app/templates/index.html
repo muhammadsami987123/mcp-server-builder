@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MCP Server Builder — Turn Any API Into an MCP Server</title>
+<meta name="description" content="Paste an API or documentation URL. AI analyzes it, designs the MCP tool interface, and generates a complete, runnable MCP server you can inspect, validate, and download." />
+<meta name="theme-color" content="#f8fafc" />
+<link rel="canonical" href="/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="MCP Server Builder — Turn Any API Into an MCP Server" />
+<meta property="og:description" content="Paste an API or documentation URL and generate a complete, runnable MCP (Model Context Protocol) server — discovered, AI-designed, and validated." />
+<meta property="og:url" content="/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="MCP Server Builder" />
+<meta name="twitter:description" content="Turn any API documentation URL into a complete, runnable MCP server." />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M10 11L6 16L10 21M22 11L26 16L22 21' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/css/styles.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        },
+        colors: {
+          bg: 'var(--bg)',
+          surface: 'var(--surface)',
+          'surface-subtle': 'var(--surface-subtle)',
+          ink: 'var(--text)',
+          'ink-secondary': 'var(--text-secondary)',
+          'ink-tertiary': 'var(--text-tertiary)',
+          line: 'var(--border)',
+          'line-strong': 'var(--border-strong)',
+          accent: 'var(--accent)',
+          'accent-hover': 'var(--accent-hover)',
+          'accent-soft': 'var(--accent-soft)',
+          success: 'var(--success)',
+          warning: 'var(--warning)',
+          danger: 'var(--danger)',
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="min-h-dvh bg-bg font-sans text-ink antialiased">
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" class="flex items-center gap-2.5 font-semibold text-ink">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8L4 12L8 16M16 8L20 12L16 16"/></svg>
+      </span>
+      <span>MCP Server Builder</span>
+    </a>
+    <nav aria-label="Primary" class="hidden items-center gap-6 text-sm font-medium text-ink-secondary md:flex">
+      <a href="#how-it-works" class="rounded hover:text-ink">How it works</a>
+      <a href="#formats" class="rounded hover:text-ink">Formats</a>
+      <a href="#security" class="rounded hover:text-ink">Security</a>
+      <a href="#faq" class="rounded hover:text-ink">FAQ</a>
+      <a href="/history" class="rounded hover:text-ink">History</a>
+    </nav>
+    <div class="flex items-center gap-2 sm:gap-3">
+      <a href="/builder?demo=1" class="btn hidden text-ink-secondary hover:bg-surface-subtle hover:text-ink sm:inline-flex">Try the demo</a>
+      <a href="/builder" class="btn bg-accent text-white hover:bg-accent-hover">Open Builder</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden border-b border-line bg-surface">
+    <div class="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-24 lg:px-8">
+      <p class="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface-subtle px-3 py-1 text-xs font-medium text-ink-secondary">
+        <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+        AI-powered · Model Context Protocol
+      </p>
+      <h1 class="text-balance text-4xl font-extrabold tracking-tight text-ink sm:text-5xl lg:text-6xl">
+        Turn Any API Into an MCP&nbsp;Server
+      </h1>
+      <p class="mx-auto mt-5 max-w-2xl text-balance text-lg leading-relaxed text-ink-secondary">
+        Paste your API or documentation URL. Our AI analyzes it, designs the MCP interface, and generates a complete, runnable MCP server.
+      </p>
+
+      <form id="hero-url-form" class="mx-auto mt-9 max-w-2xl text-left" novalidate>
+        <label for="hero-url" class="sr-only">API or documentation URL</label>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <div class="relative flex-1">
+            <svg class="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757M10.81 15.312a4.5 4.5 0 01-1.242-7.244l4.5-4.5a4.5 4.5 0 016.364 6.364l-1.757 1.757"/></svg>
+            <input id="hero-url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://api.example.com/docs" required aria-describedby="hero-url-hint hero-url-error"
+              class="w-full rounded-xl border border-line-strong bg-surface py-3.5 pl-11 pr-4 text-base text-ink shadow-sm placeholder:text-ink-tertiary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30" />
+          </div>
+          <button type="submit" id="hero-submit" class="btn shrink-0 justify-center gap-2 bg-accent px-6 py-3.5 text-base text-white hover:bg-accent-hover">
+            <span>Build MCP</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <p id="hero-url-hint" class="mt-2 text-xs text-ink-tertiary">Works with OpenAPI, Swagger, or REST documentation URLs. HTTPS recommended.</p>
+        <p id="hero-url-error" class="mt-2 hidden text-sm font-medium text-danger" role="alert"></p>
+        <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-tertiary">
+          <button type="button" id="hero-fill-example" class="rounded underline decoration-dotted underline-offset-4 hover:text-ink-secondary">Use an example URL</button>
+          <span aria-hidden="true">·</span>
+          <a href="/builder?demo=1" class="rounded underline decoration-dotted underline-offset-4 hover:text-ink-secondary">Try the demo instead</a>
+        </div>
+        <div id="recent-urls" class="mt-6 hidden text-left" aria-live="polite">
+          <p class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Recent</p>
+          <div id="recent-urls-list" class="mt-2 flex flex-wrap gap-2"></div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how-it-works" class="border-b border-line bg-bg py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-ink">How it works</h2>
+        <p class="mt-3 text-ink-secondary">From a URL to a runnable MCP server in four real, verifiable steps.</p>
+      </div>
+      <div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="card p-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft font-mono text-sm font-bold text-accent">01</div>
+          <h3 class="mt-4 font-semibold text-ink">Paste a URL</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ink-secondary">Give it an API base URL, docs page, or an OpenAPI/Swagger spec link.</p>
+        </div>
+        <div class="card p-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft font-mono text-sm font-bold text-accent">02</div>
+          <h3 class="mt-4 font-semibold text-ink">Discover &amp; analyze</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ink-secondary">We safely fetch the docs, detect the spec, and extract endpoints, parameters, and auth.</p>
+        </div>
+        <div class="card p-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft font-mono text-sm font-bold text-accent">03</div>
+          <h3 class="mt-4 font-semibold text-ink">AI designs tools</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ink-secondary">GPT-4.1-mini maps real endpoints to a clean set of MCP tools — nothing invented.</p>
+        </div>
+        <div class="card p-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft font-mono text-sm font-bold text-accent">04</div>
+          <h3 class="mt-4 font-semibold text-ink">Generate &amp; download</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ink-secondary">A complete, validated Python MCP server project — ready to run.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example generation -->
+  <section class="border-b border-line bg-surface py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wide text-accent">Example output</p>
+          <h2 class="mt-2 text-3xl font-bold tracking-tight text-ink">A real MCP tool, generated from a real endpoint</h2>
+          <p class="mt-4 leading-relaxed text-ink-secondary">Every generated tool traces back to a discovered endpoint — method, path, parameters, and auth included. Nothing is fabricated; unverifiable details are marked unknown, never invented.</p>
+          <ul class="mt-6 space-y-3 text-sm text-ink-secondary">
+            <li class="flex gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Typed input schema per tool</li>
+            <li class="flex gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Auth wired from environment variables</li>
+            <li class="flex gap-2"><svg class="mt-0.5 h-4 w-4 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Destructive operations flagged, never hidden</li>
+          </ul>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="flex items-center justify-between border-b border-line bg-surface-subtle px-4 py-2.5">
+            <span class="font-mono text-xs text-ink-secondary">src/tools/users.py</span>
+            <span class="badge badge-method-get">GET</span>
+          </div>
+          <div class="code-viewer">
+            <pre><code class="language-python">@mcp.tool()
+async def get_user(id: str) -> dict:
+    """Get a single user by ID.
+
+    Source: GET /users/{id}
+    """
+    response = await client.get(f"/users/{id}")
+    response.raise_for_status()
+    return response.json()</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supported formats -->
+  <section id="formats" class="border-b border-line bg-bg py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-ink">Supported formats</h2>
+        <p class="mt-3 text-ink-secondary">If it's discoverable, we can parse it.</p>
+      </div>
+      <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="card p-5">
+          <p class="font-mono text-xs font-semibold text-accent">OpenAPI 3.x</p>
+          <p class="mt-1.5 text-sm text-ink-secondary">openapi.json / openapi.yaml</p>
+        </div>
+        <div class="card p-5">
+          <p class="font-mono text-xs font-semibold text-accent">Swagger 2.0</p>
+          <p class="mt-1.5 text-sm text-ink-secondary">swagger.json / api-docs</p>
+        </div>
+        <div class="card p-5">
+          <p class="font-mono text-xs font-semibold text-accent">REST documentation</p>
+          <p class="mt-1.5 text-sm text-ink-secondary">Rendered HTML developer docs</p>
+        </div>
+        <div class="card p-5">
+          <p class="font-mono text-xs font-semibold text-accent">Machine-readable schemas</p>
+          <p class="mt-1.5 text-sm text-ink-secondary">Linked spec files discovered automatically</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MCP explanation + features -->
+  <section class="border-b border-line bg-surface py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div>
+          <h2 class="text-3xl font-bold tracking-tight text-ink">What is MCP?</h2>
+          <p class="mt-4 leading-relaxed text-ink-secondary">The Model Context Protocol (MCP) is an open standard that lets AI assistants call real tools — functions with typed inputs and outputs — over a well-defined interface. An MCP server exposes a set of tools; any MCP-compatible client (like Claude Desktop) can connect to it and use them.</p>
+          <p class="mt-3 leading-relaxed text-ink-secondary">MCP Server Builder automates the tedious part: reading an API's documentation and turning it into a well-designed set of MCP tools with correct typing, auth, and error handling — as real, runnable Python code.</p>
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="card p-5">
+            <h3 class="font-semibold text-ink">AI tool design</h3>
+            <p class="mt-1.5 text-sm text-ink-secondary">GPT-4.1-mini groups and names tools sensibly, grounded in real endpoints only.</p>
+          </div>
+          <div class="card p-5">
+            <h3 class="font-semibold text-ink">Validation engine</h3>
+            <p class="mt-1.5 text-sm text-ink-secondary">Every generated server is syntax-checked and schema-validated before it's marked ready.</p>
+          </div>
+          <div class="card p-5">
+            <h3 class="font-semibold text-ink">Project explorer</h3>
+            <p class="mt-1.5 text-sm text-ink-secondary">Browse the generated project with a file tree and syntax-highlighted code viewer.</p>
+          </div>
+          <div class="card p-5">
+            <h3 class="font-semibold text-ink">One-click download</h3>
+            <p class="mt-1.5 text-sm text-ink-secondary">Get a complete, ready-to-run project as a zip — README and requirements included.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security -->
+  <section id="security" class="border-b border-line bg-bg py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-ink">Built with security in mind</h2>
+        <p class="mt-3 text-ink-secondary">URLs you paste are treated as untrusted input.</p>
+      </div>
+      <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="card p-5">
+          <h3 class="flex items-center gap-2 font-semibold text-ink"><svg class="h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.25c-3.75 1.5-7.5 1.5-7.5 1.5v6.75c0 5.25 3.375 8.775 7.5 10.5 4.125-1.725 7.5-5.25 7.5-10.5V3.75s-3.75 0-7.5-1.5z"/></svg>SSRF protection</h3>
+          <p class="mt-1.5 text-sm text-ink-secondary">Private, loopback, and link-local IP ranges are always blocked — including DNS-rebinding checks on every redirect hop.</p>
+        </div>
+        <div class="card p-5">
+          <h3 class="flex items-center gap-2 font-semibold text-ink"><svg class="h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>No stored secrets</h3>
+          <p class="mt-1.5 text-sm text-ink-secondary">API keys are never logged or embedded in generated code — always read from environment variables.</p>
+        </div>
+        <div class="card p-5">
+          <h3 class="flex items-center gap-2 font-semibold text-ink"><svg class="h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Bounded fetches</h3>
+          <p class="mt-1.5 text-sm text-ink-secondary">Response size, redirect count, and discovery page limits keep every request predictable.</p>
+        </div>
+        <div class="card p-5">
+          <h3 class="flex items-center gap-2 font-semibold text-ink"><svg class="h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>Grounded AI output</h3>
+          <p class="mt-1.5 text-sm text-ink-secondary">Every MCP tool traces back to a real discovered endpoint. Nothing is hallucinated.</p>
+        </div>
+        <div class="card p-5">
+          <h3 class="flex items-center gap-2 font-semibold text-ink"><svg class="h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>Destructive-op warnings</h3>
+          <p class="mt-1.5 text-sm text-ink-secondary">DELETE and other destructive operations are always flagged, never silently hidden.</p>
+        </div>
+        <div class="card p-5">
+          <h3 class="flex items-center gap-2 font-semibold text-ink"><svg class="h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m6 1.5a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Validated before ready</h3>
+          <p class="mt-1.5 text-sm text-ink-secondary">Generated code is syntax-checked and schema-validated before a project is marked ready to download.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Developer workflow -->
+  <section class="border-b border-line bg-surface py-16 sm:py-20">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-ink">Running the generated server</h2>
+        <p class="mt-3 text-ink-secondary">A standard Python project — no proprietary runtime.</p>
+      </div>
+      <div class="card mt-10 overflow-hidden">
+        <div class="flex items-center gap-1.5 border-b border-line bg-surface-subtle px-4 py-2.5">
+          <span class="h-2.5 w-2.5 rounded-full bg-danger/60" aria-hidden="true"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-warning/60" aria-hidden="true"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-success/60" aria-hidden="true"></span>
+          <span class="ml-2 font-mono text-xs text-ink-secondary">terminal</span>
+        </div>
+        <div class="code-viewer">
+<pre><code class="language-bash">pip install -r requirements.txt
+export API_KEY=your_api_key_here
+python server.py</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="border-b border-line bg-bg py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <h2 class="text-center text-3xl font-bold tracking-tight text-ink">Frequently asked questions</h2>
+      <div class="mt-10 divide-y divide-line border-t border-line">
+        <details class="group py-5">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 font-semibold text-ink">
+            Does this work with any API?
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-ink-tertiary transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </summary>
+          <p class="mt-2.5 text-sm leading-relaxed text-ink-secondary">Best results come from APIs with an OpenAPI/Swagger spec or well-structured REST documentation. If nothing machine-readable can be found, discovery fails with a clear reason instead of guessing.</p>
+        </details>
+        <details class="group py-5">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 font-semibold text-ink">
+            Will the AI invent endpoints that don't exist?
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-ink-tertiary transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </summary>
+          <p class="mt-2.5 text-sm leading-relaxed text-ink-secondary">No. Every MCP tool must map to a discovered endpoint by method and path. Anything that can't be verified is marked unknown rather than fabricated.</p>
+        </details>
+        <details class="group py-5">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 font-semibold text-ink">
+            What happens to destructive operations like DELETE?
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-ink-tertiary transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </summary>
+          <p class="mt-2.5 text-sm leading-relaxed text-ink-secondary">They're clearly flagged with a warning badge in the tool review step. You decide whether to include them before the server is generated.</p>
+        </details>
+        <details class="group py-5">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 font-semibold text-ink">
+            Can I try it without a real API?
+            <svg class="faq-chevron h-4 w-4 shrink-0 text-ink-tertiary transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </summary>
+          <p class="mt-2.5 text-sm leading-relaxed text-ink-secondary">Yes — <a href="/builder?demo=1" class="text-accent underline underline-offset-2 hover:text-accent-hover">Try the demo</a> runs the full pipeline against a bundled sample API, no URL required.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-surface py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold tracking-tight text-ink">Ready to build your MCP server?</h2>
+      <p class="mx-auto mt-3 max-w-xl text-ink-secondary">Paste a URL and watch the whole pipeline run — discovery, analysis, AI tool design, generation, and validation.</p>
+      <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a href="/builder" class="btn bg-accent px-6 py-3 text-white hover:bg-accent-hover">Open the Builder</a>
+        <a href="/builder?demo=1" class="btn border border-line-strong bg-surface text-ink hover:bg-surface-subtle">Try the demo</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-line bg-bg">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 gap-8 sm:grid-cols-4">
+      <div class="col-span-2 sm:col-span-1">
+        <a href="/" class="flex items-center gap-2 font-semibold text-ink">
+          <span class="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-white" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8L4 12L8 16M16 8L20 12L16 16"/></svg>
+          </span>
+          MCP Server Builder
+        </a>
+        <p class="mt-3 text-sm text-ink-secondary">API documentation, understood by AI, delivered as a runnable MCP server.</p>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Product</p>
+        <ul class="mt-3 space-y-2 text-sm text-ink-secondary">
+          <li><a href="/builder" class="hover:text-ink">Builder</a></li>
+          <li><a href="/history" class="hover:text-ink">Project history</a></li>
+          <li><a href="#how-it-works" class="hover:text-ink">How it works</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Resources</p>
+        <ul class="mt-3 space-y-2 text-sm text-ink-secondary">
+          <li><a href="#formats" class="hover:text-ink">Supported formats</a></li>
+          <li><a href="#security" class="hover:text-ink">Security</a></li>
+          <li><a href="#faq" class="hover:text-ink">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Built by</p>
+        <ul class="mt-3 space-y-2 text-sm text-ink-secondary">
+          <li>Muhammad Sami Asghar Mughal</li>
+          <li>COO, MARSA Empower</li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-10 flex flex-col items-center justify-between gap-3 border-t border-line pt-6 text-xs text-ink-tertiary sm:flex-row">
+      <p>© 2026 MCP Server Builder. All rights reserved.</p>
+      <p>Built for the Model Context Protocol.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" integrity="sha512-0aPQyyeZrWj9sCA46UlmWgKOP0mUipLQ6OZXu8l4IcAmD2u31EPEy9VcIMvl7SoAaKe8bLXZhYoMaE/in+gcgA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js" integrity="sha512-wW8K3TEH5ZViD4aMPzwPdhXKs/Kb5MAm7qLRd3QliYlHy0u9utSKZsZzqlZAgJ9xxXp81acwnrZVZ8oTfoLG1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js" integrity="sha512-i0JFeiLhgBAMGfIEVqMQwALhhse1orgl34XyotSUNiNbDIB1qS9IK53sDochCIrwvj4nJ51CsDSOqhGyhZITGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>if (window.hljs) { document.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el)); }</script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

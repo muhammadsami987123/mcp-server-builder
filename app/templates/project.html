@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{% if not_found %}Project not found{% else %}Project — MCP Server Builder{% endif %}</title>
+<meta name="description" content="Inspect, validate, and download a generated MCP server project." />
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M10 11L6 16L10 21M22 11L26 16L22 21' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/css/styles.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        },
+        colors: {
+          bg: 'var(--bg)', surface: 'var(--surface)', 'surface-subtle': 'var(--surface-subtle)',
+          ink: 'var(--text)', 'ink-secondary': 'var(--text-secondary)', 'ink-tertiary': 'var(--text-tertiary)',
+          line: 'var(--border)', 'line-strong': 'var(--border-strong)',
+          accent: 'var(--accent)', 'accent-hover': 'var(--accent-hover)', 'accent-soft': 'var(--accent-soft)',
+          success: 'var(--success)', warning: 'var(--warning)', danger: 'var(--danger)',
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="min-h-dvh bg-bg font-sans text-ink antialiased" data-project-id="{{ project_id }}" data-not-found="{{ 'true' if not_found else 'false' }}">
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" class="flex items-center gap-2.5 font-semibold text-ink">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8L4 12L8 16M16 8L20 12L16 16"/></svg>
+      </span>
+      <span>MCP Server Builder</span>
+    </a>
+    <nav aria-label="Primary" class="flex items-center gap-2 sm:gap-3">
+      <a href="/history" class="btn text-ink-secondary hover:bg-surface-subtle hover:text-ink">History</a>
+      <a href="/builder" class="btn bg-accent text-white hover:bg-accent-hover">New build</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+
+  {% if not_found %}
+  <div class="rounded-xl border border-dashed border-line-strong p-12 text-center">
+    <p class="text-lg font-semibold text-ink">Project not found</p>
+    <p class="mt-1 text-sm text-ink-secondary">This project may have been deleted, or the link is incorrect.</p>
+    <div class="mt-5 flex justify-center gap-3">
+      <a href="/history" class="btn border border-line-strong bg-surface text-ink hover:bg-surface-subtle">View history</a>
+      <a href="/builder" class="btn bg-accent text-white hover:bg-accent-hover">Start a new build</a>
+    </div>
+  </div>
+  {% else %}
+
+  <div id="project-loading" class="space-y-3">
+    <div class="skeleton h-24 w-full"></div>
+    <div class="skeleton h-64 w-full"></div>
+  </div>
+
+  <div id="project-error" class="hidden rounded-lg border border-danger-border bg-danger-soft p-4" role="alert">
+    <p class="font-semibold text-danger">Couldn't load this project</p>
+    <p id="project-error-message" class="mt-1 text-sm text-danger"></p>
+    <button type="button" id="project-retry" class="btn mt-3 border border-danger-border bg-surface text-danger hover:bg-danger-soft">Try again</button>
+  </div>
+
+  <div id="project-content" class="hidden">
+    <div class="card p-5 sm:p-6">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 id="proj-name" class="truncate text-2xl font-bold text-ink"></h1>
+            <span id="proj-status-badge" class="badge"></span>
+          </div>
+          <p id="proj-source-url" class="mt-1 truncate font-mono text-xs text-ink-tertiary"></p>
+          <p id="proj-summary" class="mt-2 text-sm text-ink-secondary"></p>
+          <p id="proj-timestamps" class="mt-1 text-xs text-ink-tertiary"></p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a id="proj-download-btn" href="#" class="btn bg-accent text-white hover:bg-accent-hover">Download Server</a>
+          <button type="button" class="btn border border-line bg-surface text-ink hover:bg-surface-subtle" data-jump-tab="tools">View Tools</button>
+          <button type="button" class="btn border border-line bg-surface text-ink hover:bg-surface-subtle" data-jump-tab="files">View Code</button>
+          <button type="button" id="proj-delete-btn" class="btn border border-danger-border bg-surface text-danger hover:bg-danger-soft">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-6 overflow-hidden">
+      <div class="flex gap-1 overflow-x-auto border-b border-line px-4 pt-3" role="tablist" aria-label="Project sections">
+        <button type="button" class="tab-btn" role="tab" id="tab-btn-files" aria-selected="true" aria-controls="tab-panel-files">Files</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-btn-tools" aria-selected="false" aria-controls="tab-panel-tools">Tools</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-btn-discovery" aria-selected="false" aria-controls="tab-panel-discovery">Discovery</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-btn-validation" aria-selected="false" aria-controls="tab-panel-validation">Validation</button>
+      </div>
+      <div id="tab-panel-files" role="tabpanel"></div>
+      <div id="tab-panel-tools" role="tabpanel" hidden></div>
+      <div id="tab-panel-discovery" role="tabpanel" hidden></div>
+      <div id="tab-panel-validation" role="tabpanel" hidden></div>
+    </div>
+
+    <div class="card mt-6 p-5 sm:p-6">
+      <h2 class="text-base font-semibold text-ink">How did this MCP server turn out?</h2>
+      <div class="mt-3 flex items-center gap-1" id="feedback-stars" role="radiogroup" aria-label="Rating"></div>
+      <label for="feedback-comment" class="sr-only">Feedback comment</label>
+      <textarea id="feedback-comment" rows="2" placeholder="Optional comment…" class="mt-3 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"></textarea>
+      <button type="button" id="feedback-submit" class="btn mt-3 border border-line-strong bg-surface text-ink hover:bg-surface-subtle">Submit feedback</button>
+    </div>
+  </div>
+
+  {% endif %}
+</main>
+
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<div id="confirm-dialog" class="modal-backdrop" hidden>
+  <div class="modal-panel p-5" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <h2 id="confirm-title" class="text-base font-semibold text-ink">Are you sure?</h2>
+    <p id="confirm-message" class="mt-2 text-sm text-ink-secondary"></p>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" id="confirm-cancel" class="btn border border-line bg-surface text-ink hover:bg-surface-subtle">Cancel</button>
+      <button type="button" id="confirm-ok" class="btn bg-danger text-white hover:opacity-90">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" integrity="sha512-0aPQyyeZrWj9sCA46UlmWgKOP0mUipLQ6OZXu8l4IcAmD2u31EPEy9VcIMvl7SoAaKe8bLXZhYoMaE/in+gcgA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js" integrity="sha512-wW8K3TEH5ZViD4aMPzwPdhXKs/Kb5MAm7qLRd3QliYlHy0u9utSKZsZzqlZAgJ9xxXp81acwnrZVZ8oTfoLG1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js" integrity="sha512-Tj35Q81ghoSFK84ee0H7qn2IjAyKwZQ9oYJDjtBmKOmlSz3MUqHrXxoMxIR9GrXzFakEiSV/VMrWwyAp45Bqjw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js" integrity="sha512-i0JFeiLhgBAMGfIEVqMQwALhhse1orgl34XyotSUNiNbDIB1qS9IK53sDochCIrwvj4nJ51CsDSOqhGyhZITGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js" integrity="sha512-ua2qDFSOqEpuYTjyTTmn8L1hY4sQEZGPzu30sBKqUmZO7ky5IcfYYeYjAHKeEkO2Qf3zlUzVEli9mPPLEfovlA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js" integrity="sha512-OPn2UK2VPojF+Hh0tfLSMiaKfP0MpRfam/6Q9VVA7LK070PkQxvffqe6chqyp6R2Ml2K7+VOdxEbMpjIKwnCAw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js" integrity="sha512-l5tdeYWLczJuljMotJAdRq5FXa7yoZzvK+C6rhqciT/o0J1qdaT2CKbPltIhaKORmC6XUOUQ33a4abcU7wacpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/static/js/project.js"></script>
+</body>
+</html>

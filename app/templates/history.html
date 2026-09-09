@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project History — MCP Server Builder</title>
+<meta name="description" content="Browse previously generated MCP servers." />
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M10 11L6 16L10 21M22 11L26 16L22 21' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/css/styles.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        },
+        colors: {
+          bg: 'var(--bg)', surface: 'var(--surface)', 'surface-subtle': 'var(--surface-subtle)',
+          ink: 'var(--text)', 'ink-secondary': 'var(--text-secondary)', 'ink-tertiary': 'var(--text-tertiary)',
+          line: 'var(--border)', 'line-strong': 'var(--border-strong)',
+          accent: 'var(--accent)', 'accent-hover': 'var(--accent-hover)', 'accent-soft': 'var(--accent-soft)',
+          success: 'var(--success)', warning: 'var(--warning)', danger: 'var(--danger)',
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="min-h-dvh bg-bg font-sans text-ink antialiased">
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" class="flex items-center gap-2.5 font-semibold text-ink">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8L4 12L8 16M16 8L20 12L16 16"/></svg>
+      </span>
+      <span>MCP Server Builder</span>
+    </a>
+    <nav aria-label="Primary" class="flex items-center gap-2 sm:gap-3">
+      <a href="/builder" class="btn bg-accent text-white hover:bg-accent-hover">New build</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-ink">Recent MCP Servers</h1>
+      <p class="mt-1 text-sm text-ink-secondary">Every project you've generated, stored locally on this server.</p>
+    </div>
+    <span id="history-count" class="badge badge-neutral"></span>
+  </div>
+
+  <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+    <label for="history-search" class="sr-only">Search projects</label>
+    <div class="relative flex-1">
+      <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757M10.81 15.312a4.5 4.5 0 01-1.242-7.244l4.5-4.5a4.5 4.5 0 016.364 6.364l-1.757 1.757"/></svg>
+      <input id="history-search" type="search" placeholder="Search by server name…" class="w-full rounded-lg border border-line bg-surface py-2 pl-9 pr-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30" />
+    </div>
+    <div id="status-filters" class="flex flex-wrap gap-2" role="group" aria-label="Filter by status"></div>
+  </div>
+
+  <div id="history-loading" class="mt-6 space-y-3">
+    <div class="skeleton h-20 w-full"></div>
+    <div class="skeleton h-20 w-full"></div>
+    <div class="skeleton h-20 w-full"></div>
+  </div>
+
+  <div id="history-error" class="mt-6 hidden rounded-lg border border-danger-border bg-danger-soft p-4" role="alert">
+    <p class="font-semibold text-danger">Couldn't load project history</p>
+    <p id="history-error-message" class="mt-1 text-sm text-danger"></p>
+    <button type="button" id="history-retry" class="btn mt-3 border border-danger-border bg-surface text-danger hover:bg-danger-soft">Try again</button>
+  </div>
+
+  <div id="history-empty" class="mt-6 hidden rounded-xl border border-dashed border-line-strong p-12 text-center">
+    <p class="font-semibold text-ink">No MCP servers yet</p>
+    <p class="mt-1 text-sm text-ink-secondary">Generate your first one from a URL, or try the demo.</p>
+    <div class="mt-5 flex justify-center gap-3">
+      <a href="/builder" class="btn bg-accent text-white hover:bg-accent-hover">Open Builder</a>
+      <a href="/builder?demo=1" class="btn border border-line-strong bg-surface text-ink hover:bg-surface-subtle">Try the demo</a>
+    </div>
+  </div>
+
+  <div id="history-no-results" class="mt-6 hidden rounded-xl border border-dashed border-line-strong p-12 text-center">
+    <p class="font-semibold text-ink">No projects match your search</p>
+  </div>
+
+  <ul id="history-list" class="mt-6 space-y-3"></ul>
+</main>
+
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<div id="confirm-dialog" class="modal-backdrop" hidden>
+  <div class="modal-panel p-5" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <h2 id="confirm-title" class="text-base font-semibold text-ink">Are you sure?</h2>
+    <p id="confirm-message" class="mt-2 text-sm text-ink-secondary"></p>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" id="confirm-cancel" class="btn border border-line bg-surface text-ink hover:bg-surface-subtle">Cancel</button>
+      <button type="button" id="confirm-ok" class="btn bg-danger text-white hover:opacity-90">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/history.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+"""MCP tools for the {{ group_name }} group."""
+from __future__ import annotations
+
+from typing import Any, Optional
+
+import httpx
+
+from src.client import get_client
+from src.models import {{ model_imports }}
+
+
+def register(mcp) -> None:
+{% for block in tool_blocks %}
+{{ block }}
+
+{% endfor %}

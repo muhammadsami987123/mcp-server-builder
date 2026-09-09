@@ -80,7 +80,7 @@ docs/_build/
 .devcontainer/
 
 # Generated Projects (optional – comment if you want to version control generated MCPs)
-app/data/
+app/data/projects/
 generated-projects/
 
 # Temporary Files

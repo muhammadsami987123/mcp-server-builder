@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /$
+Allow: /builder$
+Disallow: /builder?
+Disallow: /project/
+Disallow: /history
+Disallow: /api/
+
+Sitemap: /sitemap.xml

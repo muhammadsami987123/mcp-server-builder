@@ -1,0 +1,379 @@
+/*
+  MCP Server Builder — custom design-system layer.
+  Tailwind (CDN, utility classes) handles layout/spacing/typography sizing in
+  every template. This file only carries what utility classes can't express
+  cleanly: design tokens, the stage tracker, the file tree, the code viewer
+  chrome, toasts, badges, and motion/accessibility defaults.
+*/
+
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-subtle: #f1f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+
+  --accent: #0369a1;
+  --accent-hover: #075985;
+  --accent-soft: #e0f2fe;
+  --accent-soft-text: #075985;
+
+  --success: #059669;
+  --success-soft: #ecfdf5;
+  --success-border: #a7f3d0;
+
+  --warning: #d97706;
+  --warning-soft: #fffbeb;
+  --warning-border: #fde68a;
+
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-border: #fecaca;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background-color: var(--border-strong); border-radius: 999px; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.font-mono, code, pre, kbd {
+  font-family: var(--font-mono);
+}
+
+/* Consistent visible focus ring across every interactive control */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Buttons (shared shapes; color via Tailwind utility classes) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding: 0.625rem 1.125rem;
+  border-radius: 0.5rem;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 120ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  border-radius: 0.5rem;
+  transition: background-color 180ms ease, color 180ms ease;
+  cursor: pointer;
+}
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.badge-method-get { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+.badge-method-post { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.badge-method-put { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.badge-method-patch { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.badge-method-delete { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.badge-neutral { background: var(--surface-subtle); color: var(--text-secondary); border-color: var(--border); }
+.badge-danger { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
+.badge-warning { background: var(--warning-soft); color: var(--warning); border-color: var(--warning-border); }
+.badge-success { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
+
+/* ---------- Stage tracker ---------- */
+.stage-list { position: relative; }
+.stage-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.625rem 0;
+}
+.stage-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 0.6875rem;
+  top: 1.75rem;
+  bottom: -0.625rem;
+  width: 2px;
+  background: var(--border);
+}
+.stage-item[data-state="done"]:not(:last-child)::before { background: var(--success-border); }
+.stage-dot {
+  flex-shrink: 0;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  margin-top: 0.0625rem;
+}
+.stage-item[data-state="running"] .stage-dot {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.stage-item[data-state="done"] .stage-dot {
+  border-color: var(--success);
+  background: var(--success);
+}
+.stage-item[data-state="failed"] .stage-dot {
+  border-color: var(--danger);
+  background: var(--danger);
+}
+.stage-item[data-state="waiting"] .stage-label { color: var(--text-tertiary); }
+.stage-item[data-state="running"] .stage-label { color: var(--text); font-weight: 600; }
+.stage-item[data-state="done"] .stage-label { color: var(--text-secondary); }
+.stage-item[data-state="failed"] .stage-label { color: var(--danger); font-weight: 600; }
+
+.stage-spinner {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 999px;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stage-check, .stage-x { width: 0.7rem; height: 0.7rem; color: white; }
+
+/* ---------- Skeleton loaders ---------- */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-subtle) 25%, #e8edf3 37%, var(--surface-subtle) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 0.375rem;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ---------- File tree ---------- */
+.tree-node { user-select: none; }
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  min-height: 1.75rem;
+}
+.tree-row:hover { background: var(--surface-subtle); }
+.tree-row[aria-selected="true"] {
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+  font-weight: 600;
+}
+.tree-children { margin-left: 0.9rem; border-left: 1px solid var(--border); padding-left: 0.5rem; }
+.tree-chevron { transition: transform 150ms ease; flex-shrink: 0; }
+.tree-node[data-open="true"] > .tree-row .tree-chevron { transform: rotate(90deg); }
+.tree-node[data-open="false"] > .tree-children { display: none; }
+
+/* ---------- Code viewer ---------- */
+.code-viewer {
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.code-viewer pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow: auto;
+  background: transparent !important;
+}
+.code-viewer code.hljs { background: transparent !important; padding: 0; }
+
+/* ---------- Toasts ---------- */
+#toast-container {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 22rem;
+  width: calc(100% - 2.5rem);
+}
+@media (max-width: 640px) {
+  #toast-container { left: 1.25rem; right: 1.25rem; width: auto; }
+}
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  background: var(--text);
+  color: #f8fafc;
+  border-radius: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.35);
+  font-size: 0.8125rem;
+  animation: toast-in 220ms ease-out;
+}
+.toast[data-tone="success"] { background: #064e3b; }
+.toast[data-tone="error"] { background: #7f1d1d; }
+.toast[data-tone="warning"] { background: #78350f; }
+.toast.toast-leaving { animation: toast-out 180ms ease-in forwards; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+
+/* ---------- Misc surfaces ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.divider { border-color: var(--border); }
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  padding: 0.05rem 0.375rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+/* Native <details> FAQ chevron rotation */
+details[open] > summary .faq-chevron { transform: rotate(180deg); }
+summary::-webkit-details-marker { display: none; }
+summary { list-style: none; cursor: pointer; }
+
+/* Line-clamp fallback (Tailwind CDN's default build already includes this,
+   kept here as a safety net if the CDN build ever changes). */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Panel enter animation used when a builder stage reveals its section */
+.panel-enter { animation: panel-in 260ms ease-out; }
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Skip link (accessibility) ---------- */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3.5rem;
+  background: var(--text);
+  color: #f8fafc;
+  padding: 0.625rem 1.125rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  z-index: 1100;
+  transition: top 150ms ease;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ---------- Tabs ---------- */
+.tab-btn {
+  padding: 0.625rem 0.125rem;
+  margin-right: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ---------- Modal / confirm dialog ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1050;
+}
+.modal-backdrop[hidden] { display: none; }
+.modal-panel {
+  background: var(--surface);
+  border-radius: 0.875rem;
+  border: 1px solid var(--border);
+  max-width: 26rem;
+  width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+  animation: panel-in 180ms ease-out;
+}

@@ -1,0 +1,145 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Task Manager API",
+    "description": "A simple task management API used as the built-in Demo Mode fixture for MCP Server Builder.",
+    "version": "1.2.0"
+  },
+  "servers": [
+    { "url": "https://api.demo-taskmanager.dev/v1" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "completed": { "type": "boolean" },
+          "project_id": { "type": "string" },
+          "due_date": { "type": "string", "format": "date" }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/tasks": {
+      "get": {
+        "operationId": "listTasks",
+        "summary": "List tasks",
+        "description": "Returns all tasks, optionally filtered by project or completion status.",
+        "tags": ["tasks"],
+        "parameters": [
+          { "name": "project_id", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Filter by project id" },
+          { "name": "completed", "in": "query", "required": false, "schema": { "type": "boolean" }, "description": "Filter by completion state" }
+        ],
+        "responses": {
+          "200": { "description": "A list of tasks", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Task" } } } } }
+        }
+      },
+      "post": {
+        "operationId": "createTask",
+        "summary": "Create task",
+        "description": "Creates a new task.",
+        "tags": ["tasks"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "title": { "type": "string" }, "project_id": { "type": "string" }, "due_date": { "type": "string" } }, "required": ["title"] } } }
+        },
+        "responses": {
+          "201": { "description": "Task created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } } }
+        }
+      }
+    },
+    "/tasks/{id}": {
+      "get": {
+        "operationId": "getTask",
+        "summary": "Get task",
+        "description": "Returns a single task by id.",
+        "tags": ["tasks"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Task found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } } },
+          "404": { "description": "Task not found" }
+        }
+      },
+      "patch": {
+        "operationId": "updateTask",
+        "summary": "Update task",
+        "description": "Updates fields on an existing task.",
+        "tags": ["tasks"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "title": { "type": "string" }, "completed": { "type": "boolean" } } } } }
+        },
+        "responses": {
+          "200": { "description": "Task updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } } }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTask",
+        "summary": "Delete task",
+        "description": "Permanently deletes a task.",
+        "tags": ["tasks"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "204": { "description": "Task deleted" }
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "operationId": "listProjects",
+        "summary": "List projects",
+        "description": "Returns all projects.",
+        "tags": ["projects"],
+        "parameters": [],
+        "responses": {
+          "200": { "description": "A list of projects", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Project" } } } } }
+        }
+      },
+      "post": {
+        "operationId": "createProject",
+        "summary": "Create project",
+        "description": "Creates a new project.",
+        "tags": ["projects"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" } }, "required": ["name"] } } }
+        },
+        "responses": {
+          "201": { "description": "Project created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Project" } } } }
+        }
+      }
+    },
+    "/projects/{id}": {
+      "delete": {
+        "operationId": "deleteProject",
+        "summary": "Delete project",
+        "description": "Permanently deletes a project and all of its tasks.",
+        "tags": ["projects"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "204": { "description": "Project deleted" }
+        }
+      }
+    }
+  }
+}

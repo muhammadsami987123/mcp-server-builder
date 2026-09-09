@@ -1,0 +1,24 @@
+"""Shared async HTTP client for calling {{ api_name }}."""
+from __future__ import annotations
+
+import httpx
+
+from src.config import settings
+
+
+def get_client() -> httpx.AsyncClient:
+    headers: dict[str, str] = {}
+{% if auth_type == "bearer" %}
+    if settings.api_token:
+        headers["Authorization"] = f"Bearer {settings.api_token}"
+{% elif auth_type == "oauth2" %}
+    if settings.api_token:
+        headers["Authorization"] = f"Bearer {settings.api_token}"
+{% elif auth_type == "api_key" %}
+    if settings.api_key:
+        headers["{{ auth_header_name }}"] = settings.api_key
+{% elif auth_type == "basic" %}
+    if settings.api_key:
+        headers["Authorization"] = settings.api_key
+{% endif %}
+    return httpx.AsyncClient(base_url=settings.api_base_url, headers=headers, timeout=30.0)

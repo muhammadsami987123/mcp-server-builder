@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Builder — MCP Server Builder</title>
+<meta name="description" content="Paste an API URL and watch discovery, AI tool design, generation, and validation run end to end." />
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M10 11L6 16L10 21M22 11L26 16L22 21' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/css/styles.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        },
+        colors: {
+          bg: 'var(--bg)', surface: 'var(--surface)', 'surface-subtle': 'var(--surface-subtle)',
+          ink: 'var(--text)', 'ink-secondary': 'var(--text-secondary)', 'ink-tertiary': 'var(--text-tertiary)',
+          line: 'var(--border)', 'line-strong': 'var(--border-strong)',
+          accent: 'var(--accent)', 'accent-hover': 'var(--accent-hover)', 'accent-soft': 'var(--accent-soft)',
+          success: 'var(--success)', warning: 'var(--warning)', danger: 'var(--danger)',
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="min-h-dvh bg-bg font-sans text-ink antialiased">
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" class="flex items-center gap-2.5 font-semibold text-ink">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8L4 12L8 16M16 8L20 12L16 16"/></svg>
+      </span>
+      <span>MCP Server Builder</span>
+    </a>
+    <nav aria-label="Primary" class="flex items-center gap-2 sm:gap-3">
+      <a href="/history" class="btn text-ink-secondary hover:bg-surface-subtle hover:text-ink">History</a>
+      <a href="/builder" id="new-build-link" class="btn border border-line-strong bg-surface text-ink hover:bg-surface-subtle">New build</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+
+  <!-- Step 1: URL input -->
+  <section id="url-section" class="card p-5 sm:p-6">
+    <h1 class="text-xl font-bold text-ink">Build an MCP server</h1>
+    <p class="mt-1 text-sm text-ink-secondary">Paste an API base URL, docs page, or OpenAPI/Swagger spec link.</p>
+
+    <form id="builder-url-form" class="mt-5" novalidate>
+      <label for="builder-url" class="sr-only">API or documentation URL</label>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <input id="builder-url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://api.example.com/docs" required aria-describedby="builder-url-error"
+          class="w-full rounded-xl border border-line-strong bg-surface px-4 py-3 text-base text-ink shadow-sm placeholder:text-ink-tertiary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30" />
+        <button type="submit" id="builder-submit" class="btn shrink-0 justify-center gap-2 bg-accent px-6 py-3 text-white hover:bg-accent-hover">
+          <span id="builder-submit-label">Build MCP</span>
+          <svg id="builder-submit-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <p id="builder-url-error" class="mt-2 hidden text-sm font-medium text-danger" role="alert"></p>
+      <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-tertiary">
+        <button type="button" id="builder-fill-example" class="rounded underline decoration-dotted underline-offset-4 hover:text-ink-secondary">Use an example URL</button>
+        <span aria-hidden="true">·</span>
+        <button type="button" id="builder-try-demo" class="rounded underline decoration-dotted underline-offset-4 hover:text-ink-secondary">Try the demo (no URL needed)</button>
+      </div>
+      <div id="builder-recent-urls" class="mt-4 hidden" aria-live="polite">
+        <p class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Recent</p>
+        <div id="builder-recent-urls-list" class="mt-2 flex flex-wrap gap-2"></div>
+      </div>
+    </form>
+  </section>
+
+  <!-- Step 2: Stage tracker -->
+  <section id="stage-section" class="card mt-6 p-5 sm:p-6" hidden>
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-base font-semibold text-ink">Building your MCP server</h2>
+      <span id="stage-source" class="max-w-[16rem] truncate font-mono text-xs text-ink-tertiary"></span>
+    </div>
+    <div class="sr-only" role="status" aria-live="polite" id="stage-announcer"></div>
+    <ol class="stage-list mt-4" id="stage-list"></ol>
+    <div id="stage-failure" class="mt-4 hidden rounded-lg border border-danger-border bg-danger-soft p-4" role="alert">
+      <p class="font-semibold text-danger" id="stage-failure-title">Something went wrong</p>
+      <p class="mt-1 text-sm text-danger" id="stage-failure-message"></p>
+      <button type="button" id="stage-retry" class="btn mt-3 border border-danger-border bg-surface text-danger hover:bg-danger-soft">Try again</button>
+    </div>
+  </section>
+
+  <!-- Step 3: Discovery report -->
+  <section id="discovery-section" class="mt-6 space-y-6" hidden>
+    <div class="card p-5 sm:p-6">
+      <h2 class="text-base font-semibold text-ink">Discovery report</h2>
+      <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">API name</dt>
+          <dd class="mt-1 truncate font-medium text-ink" id="disc-name">—</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Base URL</dt>
+          <dd class="mt-1 truncate font-mono text-sm text-ink" id="disc-base-url">—</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Authentication</dt>
+          <dd class="mt-1 text-ink" id="disc-auth">—</dd>
+        </div>
+      </dl>
+      <p class="mt-3 text-sm leading-relaxed text-ink-secondary" id="disc-description"></p>
+      <div class="mt-4 flex flex-wrap gap-2" id="disc-auth-details"></div>
+    </div>
+
+    <div class="card p-5 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-base font-semibold text-ink">Endpoints <span id="disc-endpoint-count" class="font-mono text-sm font-normal text-ink-tertiary"></span></h2>
+        <div class="flex items-center gap-2">
+          <label for="endpoint-search" class="sr-only">Search endpoints</label>
+          <input id="endpoint-search" type="search" placeholder="Search endpoints…" class="w-48 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30" />
+        </div>
+      </div>
+      <div id="endpoint-method-filters" class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter endpoints by HTTP method"></div>
+      <div id="endpoint-list" class="mt-4 max-h-96 space-y-2 overflow-y-auto pr-1"></div>
+      <p id="endpoint-empty" class="mt-4 hidden text-sm text-ink-tertiary">No endpoints match your search.</p>
+    </div>
+
+    <div class="card p-5 sm:p-6" id="schemas-card" hidden>
+      <h2 class="text-base font-semibold text-ink">Schemas <span id="disc-schema-count" class="font-mono text-sm font-normal text-ink-tertiary"></span></h2>
+      <div id="schema-list" class="mt-3 flex flex-wrap gap-2"></div>
+    </div>
+  </section>
+
+  <!-- Step 4: Tool selection -->
+  <section id="tools-section" class="card mt-6 p-5 sm:p-6" hidden>
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-base font-semibold text-ink">Select MCP tools</h2>
+        <p class="mt-1 text-sm text-ink-secondary" id="tools-subtitle">Review the tools AI designed from your API before generating the server.</p>
+      </div>
+      <span class="badge badge-neutral" id="tools-selected-count">0 selected</span>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <label for="tool-search" class="sr-only">Search tools</label>
+      <input id="tool-search" type="search" placeholder="Search tools…" class="w-48 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30" />
+      <button type="button" id="tools-select-all" class="btn border border-line bg-surface px-3 py-1.5 text-xs text-ink-secondary hover:bg-surface-subtle">Select all</button>
+      <button type="button" id="tools-select-none" class="btn border border-line bg-surface px-3 py-1.5 text-xs text-ink-secondary hover:bg-surface-subtle">Select none</button>
+      <button type="button" id="tools-select-safe" class="btn border border-line bg-surface px-3 py-1.5 text-xs text-ink-secondary hover:bg-surface-subtle">Non-destructive only</button>
+    </div>
+
+    <div id="tool-list" class="mt-4 max-h-[28rem] space-y-2 overflow-y-auto pr-1"></div>
+
+    <details class="group mt-5 rounded-lg border border-line">
+      <summary class="flex cursor-pointer items-center justify-between gap-2 px-4 py-3 text-sm font-semibold text-ink">
+        Generation preferences
+        <svg class="faq-chevron h-4 w-4 shrink-0 text-ink-tertiary transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+      </summary>
+      <div class="grid grid-cols-1 gap-4 border-t border-line p-4 sm:grid-cols-2">
+        <div>
+          <label for="pref-server-name" class="text-xs font-semibold text-ink-secondary">Server name</label>
+          <input id="pref-server-name" type="text" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30" />
+        </div>
+        <div>
+          <label for="pref-naming" class="text-xs font-semibold text-ink-secondary">Tool naming style</label>
+          <select id="pref-naming" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30">
+            <option value="snake_case">snake_case</option>
+            <option value="camelCase">camelCase</option>
+          </select>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="pref-description" class="text-xs font-semibold text-ink-secondary">Description</label>
+          <textarea id="pref-description" rows="2" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"></textarea>
+        </div>
+        <div class="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:flex-wrap sm:gap-x-6">
+          <label class="inline-flex items-center gap-2 text-sm text-ink-secondary"><input id="pref-read-only" type="checkbox" checked class="h-4 w-4 rounded border-line-strong text-accent focus:ring-accent" /> Include read-only endpoints</label>
+          <label class="inline-flex items-center gap-2 text-sm text-ink-secondary"><input id="pref-group" type="checkbox" checked class="h-4 w-4 rounded border-line-strong text-accent focus:ring-accent" /> Group tools by resource</label>
+          <label class="inline-flex items-center gap-2 text-sm text-ink-secondary"><input id="pref-tests" type="checkbox" checked class="h-4 w-4 rounded border-line-strong text-accent focus:ring-accent" /> Generate tests</label>
+          <label class="inline-flex items-center gap-2 text-sm text-ink-secondary"><input id="pref-docs" type="checkbox" checked class="h-4 w-4 rounded border-line-strong text-accent focus:ring-accent" /> Generate documentation</label>
+        </div>
+      </div>
+    </details>
+
+    <div class="mt-5 flex items-center justify-end gap-3">
+      <span id="generate-hint" class="text-sm text-ink-tertiary"></span>
+      <button type="button" id="generate-btn" class="btn bg-accent px-6 py-2.5 text-white hover:bg-accent-hover">Generate Server</button>
+    </div>
+  </section>
+
+  <!-- Step 5: Result / project explorer -->
+  <section id="result-section" class="mt-6" hidden></section>
+
+</main>
+
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Reusable confirm dialog -->
+<div id="confirm-dialog" class="modal-backdrop" hidden>
+  <div class="modal-panel p-5" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <h2 id="confirm-title" class="text-base font-semibold text-ink">Are you sure?</h2>
+    <p id="confirm-message" class="mt-2 text-sm text-ink-secondary"></p>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" id="confirm-cancel" class="btn border border-line bg-surface text-ink hover:bg-surface-subtle">Cancel</button>
+      <button type="button" id="confirm-ok" class="btn bg-danger text-white hover:opacity-90">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" integrity="sha512-0aPQyyeZrWj9sCA46UlmWgKOP0mUipLQ6OZXu8l4IcAmD2u31EPEy9VcIMvl7SoAaKe8bLXZhYoMaE/in+gcgA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js" integrity="sha512-wW8K3TEH5ZViD4aMPzwPdhXKs/Kb5MAm7qLRd3QliYlHy0u9utSKZsZzqlZAgJ9xxXp81acwnrZVZ8oTfoLG1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js" integrity="sha512-Tj35Q81ghoSFK84ee0H7qn2IjAyKwZQ9oYJDjtBmKOmlSz3MUqHrXxoMxIR9GrXzFakEiSV/VMrWwyAp45Bqjw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js" integrity="sha512-i0JFeiLhgBAMGfIEVqMQwALhhse1orgl34XyotSUNiNbDIB1qS9IK53sDochCIrwvj4nJ51CsDSOqhGyhZITGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js" integrity="sha512-ua2qDFSOqEpuYTjyTTmn8L1hY4sQEZGPzu30sBKqUmZO7ky5IcfYYeYjAHKeEkO2Qf3zlUzVEli9mPPLEfovlA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js" integrity="sha512-OPn2UK2VPojF+Hh0tfLSMiaKfP0MpRfam/6Q9VVA7LK070PkQxvffqe6chqyp6R2Ml2K7+VOdxEbMpjIKwnCAw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js" integrity="sha512-l5tdeYWLczJuljMotJAdRq5FXa7yoZzvK+C6rhqciT/o0J1qdaT2CKbPltIhaKORmC6XUOUQ33a4abcU7wacpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/static/js/builder.js"></script>
+</body>
+</html>
